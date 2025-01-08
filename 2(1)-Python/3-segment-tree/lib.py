@@ -40,19 +40,19 @@ class SegmentTree(Generic[T, U]):
             * leaves: [size, size + n - 1]
             * 내부 노드: [1..size-1]
         """
-        self.n = len(data)
+        self.n = len(data) -1
         self.default = default
         self.convert = convert
         self.combine = combine
 
         self.size = 1
-        while self.size < self.n:
+        while self.size < self.n+1:
             self.size <<= 1
 
         self.tree = [default] * (2 * self.size)
 
         
-        for i in range(self.n):
+        for i in range(self.n+1):
             self.tree[self.size + i] = self.convert(data[i])
 
         for i in range(self.size - 1, 0, -1):
@@ -64,7 +64,7 @@ class SegmentTree(Generic[T, U]):
         '새로운 값'으로 세팅 (기존 값에 더하거나 빼는 것이 아님!)
         예) update(5, 10) -> 맛=5인 리프에 새 값=10으로 설정
         """
-        pos = self.size + (idx - 1)
+        pos = self.size + (idx)
         self.tree[pos] = self.convert(value)
 
         pos >>= 1
@@ -80,8 +80,8 @@ class SegmentTree(Generic[T, U]):
             query(2, 5) -> [2,5) => 맛2, 맛3, 맛4
         """
         res = self.default
-        left = self.size + (left - 1)
-        right = self.size + (right - 1)
+        left += self.size 
+        right += self.size 
 
         while left < right:
             if left & 1:
