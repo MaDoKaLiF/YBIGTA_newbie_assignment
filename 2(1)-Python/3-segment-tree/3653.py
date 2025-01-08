@@ -49,7 +49,8 @@ def main() -> None:
         2) top 한 칸 올리고, 그 위치에 x DVD 올림
         3) x의 위치 갱신
         '''
-        result = []
+        result: list[str] = []
+
         for x in to_watch:
             above = st.query(pos[x]+1, size+1)
             if len(result)==0: 
