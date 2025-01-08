@@ -19,6 +19,10 @@ class SegmentTree(Generic[T, U]):
     - default: U                -> 세그먼트 트리에 사용될 기본값
     - convert: Callable[[T], U] -> 원본배열 원소(T)를 트리 노드타입(U)으로 변환하는 함수
     - combine: Callable[[U, U], U] -> 두 노드를 병합할 때 사용할 함수
+
+    (1-based 인덱스 사용 예시)
+    - update(1, 10) : '맛=1'인 리프 노드에 값을 세팅/변경
+    - query(1, 3)   : [1,3) 구간 병합 결과
     """
 
     def __init__(
@@ -34,7 +38,7 @@ class SegmentTree(Generic[T, U]):
           - size: 2의 거듭제곱 (n 이상)
           - tree: 1-based 인덱스 (길이=2*size)
             * leaves: [size, size + n - 1]
-            * 내부 노드: [1 .. size-1]
+            * 내부 노드: [1..size-1]
         """
         self.n = len(data)
         self.default = default
@@ -43,10 +47,11 @@ class SegmentTree(Generic[T, U]):
 
         self.size = 1
         while self.size < self.n:
-            self.size <<= 1  
+            self.size <<= 1
 
         self.tree = [default] * (2 * self.size)
 
+        
         for i in range(self.n):
             self.tree[self.size + i] = self.convert(data[i])
 
@@ -55,24 +60,28 @@ class SegmentTree(Generic[T, U]):
 
     def update(self, idx: int, value: T) -> None:
         """
-        단일 위치 idx(0-based 아님)에 대해
+        단일 위치 idx(1-based)에 대해
         '새로운 값'으로 세팅 (기존 값에 더하거나 빼는 것이 아님!)
+        예) update(5, 10) -> 맛=5인 리프에 새 값=10으로 설정
         """
-        idx += self.size
-        self.tree[idx] = self.convert(value)
+        pos = self.size + (idx - 1)
+        self.tree[pos] = self.convert(value)
 
-        idx >>= 1
-        while idx >= 1:
-            self.tree[idx] = self.combine(self.tree[idx << 1], self.tree[idx << 1 | 1])
-            idx >>= 1
+        pos >>= 1
+        while pos >= 1:
+            self.tree[pos] = self.combine(self.tree[pos << 1], self.tree[pos << 1 | 1])
+            pos >>= 1
 
     def query(self, left: int, right: int) -> U:
         """
-        [left, right) 구간의 병합 결과(U)를 반환
+        [left, right) 구간의 병합 결과(U)를 반환 (1-based)
+        
+        예) query(1, 2) -> [1,2) 즉 "맛=1"만 포함
+            query(2, 5) -> [2,5) => 맛2, 맛3, 맛4
         """
         res = self.default
-        left += self.size
-        right += self.size
+        left = self.size + (left - 1)
+        right = self.size + (right - 1)
 
         while left < right:
             if left & 1:
@@ -87,23 +96,23 @@ class SegmentTree(Generic[T, U]):
 
     def find_kth(self, k: int) -> int:
         """
-        'k번째 사탕'의 맛(인덱스)을 찾기 위한 함수
-        - 트리에 저장된 값은 '해당 구간의 사탕 개수 합'
-        - 루트(1)부터 시작
-          * 왼쪽 자식의 합 >= k 이면 왼쪽으로 이동
-          * 아니면 k에서 왼쪽 자식 합을 빼고 오른쪽 자식으로 이동
-        - 리프에 도달하면, 그 리프 인덱스 - (size - 1)이 '맛' (1-based)
+        'k번째 사탕'의 맛(1-based)을 찾는 함수
+        - 트리에 저장된 값은 구간 합(사탕 개수)
+        - 루트(인덱스 1)부터 내려가며
+          left_sum = self.tree[left_child]
+          if left_sum >= k:  왼쪽 자식으로
+          else: k -= left_sum 후 오른쪽 자식으로
+        - 리프 도달 시, 맛 번호 = (idx - (size - 1))
         """
         idx = 1
         while idx < self.size:
             left = idx << 1
-            right = left | 1
             left_sum = self.tree[left]
-            if left_sum >= k:  # type: ignore
+            if left_sum >= k:
                 idx = left
             else:
-                k -= left_sum  # type: ignore
-                idx = right
+                k -= left_sum
+                idx = left + 1
         return idx - (self.size - 1)
 
     def __repr__(self) -> str:
