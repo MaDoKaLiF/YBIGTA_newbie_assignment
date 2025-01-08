@@ -9,7 +9,7 @@ import sys
 
 
 def main() -> None:
-    intify: Callable[[str], list[int]] = lambda l: [*map(int, l.split())]
+    intify: Callable[[str], list[int]] = lambda l: [*map(int, l.split())] #str to list[int]
 
     lines: list[str] = sys.stdin.readlines()
 
