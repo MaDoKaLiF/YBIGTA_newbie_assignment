@@ -105,7 +105,7 @@ class SegmentTree(Generic[T, U]):
         - 리프 도달 시, 맛 번호 = (idx - (size - 1))
         """
         idx = 1
-        while idx < self.size:
+        while idx < self.size: 
             left = idx << 1
             left_sum = self.tree[left]
             if left_sum >= k: # type: ignore
