@@ -38,7 +38,7 @@ pip install mypy
 cd submission || { echo "submission 디렉토리로 이동 실패"; exit 1; }
 
 for file in *.py; do
-    input_file="../${file%.py}_input"
+    input_file="../input/${file%.py}_input"
     output_file="../output/${file%.py}_output"
     
     if [[ -f "$input_file" ]]; then

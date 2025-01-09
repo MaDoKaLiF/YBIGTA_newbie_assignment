@@ -108,10 +108,10 @@ class SegmentTree(Generic[T, U]):
         while idx < self.size:
             left = idx << 1
             left_sum = self.tree[left]
-            if left_sum >= k:
+            if left_sum >= k: # type: ignore
                 idx = left
             else:
-                k -= left_sum
+                k -= left_sum # type: ignore
                 idx = left + 1
         return idx - (self.size - 1)
 
@@ -169,7 +169,7 @@ def main() -> None:
         2) top 한 칸 올리고, 그 위치에 x DVD 올림
         3) x의 위치 갱신
         '''
-        result = []
+        result: list[str] = []
         for x in to_watch:
             above = st.query(pos[x]+1, size+1)
             if len(result)==0: 

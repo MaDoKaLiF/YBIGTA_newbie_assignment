@@ -108,10 +108,10 @@ class SegmentTree(Generic[T, U]):
         while idx < self.size:
             left = idx << 1
             left_sum = self.tree[left]
-            if left_sum >= k:
+            if left_sum >= k: # type: ignore
                 idx = left
             else:
-                k -= left_sum
+                k -= left_sum # type: ignore
                 idx = left + 1
         return idx - (self.size - 1)
 
