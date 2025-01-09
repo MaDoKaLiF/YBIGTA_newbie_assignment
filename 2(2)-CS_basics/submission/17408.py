@@ -129,7 +129,7 @@ TODO:
 """
 
 
-class Pair(tuple[int, int]):
+class Pair(tuple[int, int]): # type: ignore
     """
     힌트: 2243, 3653에서 int에 대한 세그먼트 트리를 만들었다면 여기서는 Pair에 대한 세그먼트 트리를 만들 수 있을지도...?
     """
