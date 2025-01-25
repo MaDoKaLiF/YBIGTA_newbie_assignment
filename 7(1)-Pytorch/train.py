@@ -9,18 +9,33 @@ from config import *
 
 NUM_CLASSES = 10  
 
-# CIFAR-10 데이터셋 로드
-train_dataset = datasets.CIFAR10(root="./data", train=True, download=True)
+transform = transforms.Compose([
+    transforms.RandomHorizontalFlip(),
+    transforms.RandomCrop(32, padding=4),
+    transforms.ToTensor(),
+    transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))
+])
+
+train_dataset = datasets.CIFAR10(root="./data", train=True, transform=transform, download=True)
 train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
 
-test_dataset = datasets.CIFAR10(root="./data", train=False, download=True)
+test_dataset = datasets.CIFAR10(root="./data", train=False, transform=transform, download=True)
 test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False)
+
+
+
+# CIFAR-10 데이터셋 로드
+# train_dataset = datasets.CIFAR10(root="./data", train=True ,download=True)
+# train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
+
+# test_dataset = datasets.CIFAR10(root="./data", train=False,download=True)
+# test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # resnet 18 선언하기
 ## TODO
-model = ResNet()
+model = ResNet(BasicBlock, [2, 2, 2, 2], num_classes=NUM_CLASSES).to(device)
 
 criterion: nn.CrossEntropyLoss = nn.CrossEntropyLoss()
 optimizer: optim.Adam = optim.Adam(model.parameters(), lr=LEARNING_RATE)
@@ -31,7 +46,8 @@ def train(model: nn.Module, loader: DataLoader, criterion: nn.Module, optimizer:
     total_loss: float = 0
     correct: int = 0
     total: int = 0
-
+    print(len(loader),'len(loader)')
+    kkk=0
     for inputs, targets in loader:
         inputs, targets = inputs.to(device), targets.to(device)
 
@@ -46,6 +62,8 @@ def train(model: nn.Module, loader: DataLoader, criterion: nn.Module, optimizer:
         _, predicted = outputs.max(1)
         total += targets.size(0)
         correct += predicted.eq(targets).sum().item()
+        kkk+=1
+        print('con',kkk)
 
     accuracy: float = 100. * correct / total
     print(f"Train Loss: {total_loss / len(loader):.4f}, Accuracy: {accuracy:.2f}%")
