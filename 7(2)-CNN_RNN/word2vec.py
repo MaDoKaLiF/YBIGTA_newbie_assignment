@@ -43,7 +43,7 @@ class Word2Vec(nn.Module):
 
             for sentence in corpus:
                 tokens = tokenizer.encode(sentence, add_special_tokens=False,  truncation=True)
-                
+                print(f"[sentence {sentence}/{len(corpus)}]")
                 if self.method == "skipgram":
                     loss = self._train_skipgram(tokens, optimizer, criterion)
                 else:  # cbow

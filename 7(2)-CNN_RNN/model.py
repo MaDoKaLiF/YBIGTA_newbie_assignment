@@ -20,7 +20,10 @@ class MyGRULanguageModel(nn.Module):
         self.head = nn.Linear(d_model, num_classes)
 
     def forward(self, input_ids: LongTensor) -> Tensor:
-        inputs = self.embeddings(input_ids)
-        last_hidden_state = self.gru(inputs)
+        inputk = self.embeddings(input_ids)
+        inputk = inputk.transpose(0, 1)
+
+        last_hidden_state = self.gru(inputk)
+        last_hidden_state=last_hidden_state[-1]
         logits = self.head(last_hidden_state)
         return logits

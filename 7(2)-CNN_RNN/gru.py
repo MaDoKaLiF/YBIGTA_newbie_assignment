@@ -31,8 +31,8 @@ class GRUCell(nn.Module):
           h_t = (1 - z_t) * h_{t-1} + z_t * h_t~
         
         Args:
-            x (Tensor):  [batch_size, input_size]
-            h (Tensor):  [batch_size, hidden_size] (이전 시점 은닉 상태)
+            x (Tensor):  [batch_size, d_model]
+            h (Tensor):  [batch_size, d_model] (이전 시점 은닉 상태)
 
         Returns:
             h_next (Tensor): [batch_size, hidden_size] (현재 시점 은닉 상태)
@@ -73,12 +73,12 @@ class GRU(nn.Module):
         입력과 은닉 상태를 순회하며 매 타임스텝의 hidden state를 계산.
 
         Args:
-            inputs (Tensor): [seq_len, batch_size, input_size] 형태의 입력 시퀀스
+            inputs (Tensor): [batch_size, seq_len, input_size] 형태의 입력 시퀀스
 
         Returns:
-            outputs (Tensor): [seq_len, batch_size, hidden_size] 모든 타임스텝의 hidden state
+            outputs (Tensor): [batch_size, seq_len, hidden_size] 모든 타임스텝의 hidden state
         """
-        seq_len, batch_size, _ = inputs.size()
+        seq_len,batch_size, _ = inputs.size()
 
         # 초기 hidden state: 0으로 초기화 (필요 시 전달 인자로 받아서 초기화 가능)
         h_t = torch.zeros(batch_size, self.hidden_size, device=inputs.device)
@@ -90,5 +90,5 @@ class GRU(nn.Module):
             outputs.append(h_t.unsqueeze(0))
 
         # 모든 타임스텝의 hidden state를 [seq_len, batch_size, hidden_size]로 cat
-        outputs = torch.cat(outputs, dim=0)
-        return outputs
+        final_outputs: Tensor = torch.cat(outputs, dim=0)
+        return final_outputs

@@ -11,7 +11,7 @@ def load_corpus() -> list[str]:
     dataset = load_dataset("imdb", split="train")
 
     # 전체 25,000개 중, 앞쪽 N개만 선택 (예: 100개)
-    N = 100
+    N = 10
     dataset = dataset.select(range(N))
 
     # "text" 필드를 추출하여 list[str] 형태로 변환
